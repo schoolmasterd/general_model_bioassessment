@@ -1,0 +1,15 @@
+﻿derive.estimand,parameterize.estimand,derive.statistic,assumption,indicator.species,ecotoxicology,oe,ambi,mmi,dscore,Upsilon
+1,0,0,marginal.m,1,1,0,0,0,1,1
+1,0,0,ind.s,1,1,0,1,0,1,1
+1,0,0,set.e,1,1,0,1,1,0,0
+1,0,0,ind.ed,1,0,1,1,1,1,0
+1,0,0,marginal.p,1,0,1,1,1,1,1
+1,0,0,marginal.s,0,0,0,0,1,0,0
+1,0,0,marginal.e,0,0,0,0,0,0,0
+1,0,0,marginal.d,0,0,0,0,0,0,1
+0,1,0,samp.d,1,0,1,0,1,0,0
+0,0,1,estimand.PsGd,1,0,0,0,0,0,0
+0,0,1,estimand.PsGp,0,1,0,0,0,0,0
+0,0,1,estimand.PmGed,0,0,1,0,0,1,0
+,,1,estimand.PmGd,0,0,0,1,1,0,0
+0,0,1,query.sGe,0,0,0,0,0,0,1
