@@ -1,11 +1,7 @@
-
-
 #This script creates figure 2 of the main text
-
 
 # get data
 d1<-read.csv("Data/derive_model_queries_summary.csv",check.names = F)
-
 
 # transpose
 n <- d1$operation # store names
@@ -14,6 +10,7 @@ colnames(d1) <- n # recover names
 
 # check name order
 ifelse(names(table(rownames(d1)==c("indicator.species","ecotoxicology","oe","ambi","mmi",'dscore','Upsilon')))==T,'leaf names are correct.','incorrect leaf names. edit tlab')
+
 # set names for display
 tlab=c('IS','ET','O/E','AMBI','MMI','D-score','MVC')
 

@@ -1,19 +1,17 @@
 #This script fits the model used to predict the presence of taxa based on the
-# vegetation data and environmental variables from Coastwide Reference Monitoring System (CRMS)
-# this script can take a long time to run due to the cross-validation
+#vegetation data and environmental variables from Coastwide Reference Monitoring System (CRMS).
+#This script can take a long time to run due to the cross-validation
 
 #load a library that allows lasso regularization
 library(glmnet)
 
 #load the bits of training data that we need
-
 spp_pool<-read.csv("Data/training_spp_pool.csv")
 env_names<-read.csv("Data/environmental_var_names.csv")
 df<-read.csv("Data/CRMS_training_data.csv")
 
-#grap spp names and site
+#grab spp names and site
 spp_nms<-spp_pool$Short_Name
-
 
 #select the rows to use 
 #get the environmental variables
@@ -23,12 +21,13 @@ bas_vars<-c("AT","BA","BS","CS","ME","MR","PO","TE","TV")
 #remove rows with any missing data
 df_comp<-df[complete.cases(df[,c(env_vars,bas_vars)]),]
 crms_site<-sapply(strsplit(df_comp$Station_ID,"-"),"[",1)
+
 #select holdout cases. These were selected by stratified random sampling to get
-#one site from each habitat type in each the Chenier and Deltaic regions of the Coast
+#one site from each habitat type in each region (Chenier, Deltaic) of the Coast.
 who<-c("CRMS0556","CRMS2568","CRMS0665","CRMS0146","CRMS0532","CRMS3784","CRMS6302","CRMS4690")
 get_cases<-which(crms_site%in%who)
 
-#remove them
+#remove holdout cases
 df_train<-df_comp[-get_cases,]
 dim(df_train)
 
@@ -41,11 +40,13 @@ col_means_mod_vars<-apply(df_train[,env_vars],2,mean,na.rm=T)
 col_sd_mod_vars<-apply(df_train[,env_vars],2,sd,na.rm=T)
 
 write.csv(rbind(means=col_means_mod_vars,sd=col_sd_mod_vars),"Output/enviromental_means.csv")
+
 #replace raw env vars with normalized
 df_train[,env_vars]<-sweep(sweep(df_train[,env_vars],2,col_means_mod_vars,FUN = "-"),2,col_sd_mod_vars,"/")
 
 #look at occurrences across the training sample
 occs<-apply(df_train[,spp_nms],2,sum)
+
 #find ubiquitous spp to hold for possible inclusion later
 ubiq<-names(occs[occs/dim(df_train)[1]>=.3])
 
@@ -78,10 +79,8 @@ abline(v=.2,lwd=2,lty=2)
 sum(unlist(pct_deviance)>.10)
 
 #grab holdout data
-
 df_latest<-df_comp[unlist(get_cases),]
 df_latest[,env_vars]<-sweep(sweep(df_latest[,env_vars],2,col_means_mod_vars,FUN = "-"),2,col_sd_mod_vars,"/")
-
 spp_coefs<-sapply(spp_nms,function(x)as.vector(coef(fts[[x]],s=min(fts[[x]]$lambda))))
 rownames(spp_coefs)<-c("Intercept",env_vars,bas_vars)
 
@@ -112,20 +111,20 @@ df_fibs<-read.csv("Data/FIBS_data.csv",check.names = F)
 get_spp<-df_fibs$`Scientific Name As Currently Recognized`%in%spp_pool$Scientific_Name[match(sp_cand,spp_pool$Short_Name)]
 fibs_table<-table(df_fibs$`Scientific Name As Currently Recognized`[get_spp],df_fibs$Community[get_spp])
 pct_tab<-sweep(fibs_table,1,STATS = apply(fibs_table,1,sum),FUN = "/")[,c(2,3,1,4)]
+
 #do the same for set of all taxa
 get_spp_all<-df_fibs$`Scientific Name As Currently Recognized`%in%spp_pool$Scientific_Name[match(spp_nms,spp_pool$Short_Name)]
 fibs_all_table<-table(df_fibs$`Scientific Name As Currently Recognized`[get_spp_all],df_fibs$Community[get_spp_all])
-
 pct_tab_all<-sweep(fibs_all_table,1,STATS = apply(fibs_all_table,1,sum),FUN = "/")[,c(2,3,1,4)]
+
 #create histograms of salinity score where Fresh = 1; Intermediate = 2; Brackish = 3; Saline = 4
 grp_all<-hist(as.matrix(pct_tab_all)%*%as.matrix(1:4),freq = F)
 grp_sel<-hist(as.matrix(pct_tab)%*%as.matrix(1:4))
 
-#use chi-squared test with (number of categories -1 degree of freedom) to test
-#if these differ
+#use chi-squared test with (number of categories -1 degree of freedom) to test if these differ
 1-pchisq(sum((grp_sel$density-grp_all$density)^2/grp_all$density),length(grp_all$density)-1)
 
-#create the plots for the appendix
+#create ans save the Figure S1
 pdf("Output/figure_S1.pdf",height = 5,width = 8)
 par(mfrow=c(1,2))
 plot(log(foo[sp_cand,"act"]),log(foo[sp_cand,"sim"]),pch=21,bg="grey",bty="l",xlim=c(1,6),ylim=c(1,6),

@@ -1,6 +1,9 @@
 #This script uses the combination of trained model and data from the Restoration
 # areas to calculate the MVC
+
+#load the library for latex-style sybmols in plots
 library(latex2exp)
+
 #load the data from the training procedure
 spp_coef<-read.csv("Output/species_models.csv",row.names = 1)
 spp_info<-read.csv("Data/training_spp_pool.csv")
@@ -11,9 +14,10 @@ bas_vars<-rownames(spp_coef)[8:16]
 df_test<-read.csv("Data/Other_rest_test_data.csv")
 
 #grab the set of species names that are both in the restoration assemblages
-# and that we have models for
+#and that we have models for
 spp_nms<-names(spp_coef)
-#look species absent from restoration assemblage data and add them with all zero for occupancy
+
+#look species absent from restoration assemblage data and add them and set occupancy to zero
 missing_spp<-spp_nms[!spp_nms%in%names(df_test)]
 miss_mat<-matrix(0,nrow=dim(df_test)[1],ncol=length(missing_spp))
 colnames(miss_mat)<-missing_spp
@@ -26,20 +30,21 @@ df_test[,spp_nms]
 #get complete cases for the data
 df_no_na<-df_test[complete.cases(df_test),]
 env_vars<-names(env_adj)
+
 #set up function to calculate the quantile residual
 res_fun<-function(x)(pbinom(x-1,size = 1,spp_prob)+.5*dbinom(x,size = 1,spp_prob))
 
-#theoretical mean and variance of the quantial residual
+#theoretical mean and variance of the quantile residual
 fun<-function(x,p)qlogis(pbinom(x-1,size = 1,p)+.5*dbinom(x,size = 1,p))
 qr_mu<-function(p)abs(fun(1,p))*p+abs(fun(0,p))*(1-p)
 qr_var<-function(p)(abs(fun(1,p))-qr_mu(p))^2*p+(abs(fun(0,p))-qr_mu(p))^2*(1-p)
 
-#grab the most recent observation for each station
+#grab the holdout observations
 latest_obs<-tapply(df_no_na$Year,df_no_na$Station_ID,function(x)max(x))
 get_cases<-sapply(unique(df_no_na$Station_ID),function(x)which(df_no_na$Station_ID==x&df_no_na$Year==latest_obs[x]))
 df_obs<-df_no_na[get_cases,]
 
-#center the test data using the mean and sd from the training set 
+#normalize the environmental variables using mean and sd from the training set 
 env_means<-as.numeric(env_adj[1,])
 env_sd<-as.numeric(env_adj[2,])
 names(env_means)<-names(env_sd)<-colnames(env_adj)
@@ -72,12 +77,14 @@ for(i in 1:len){
 }
 
 plt_details<-sapply(names(test_metric),function(x)NULL)
+
 for(i in 1:length(test_metric)){
   tmp<-qres[i,order(qres[i,])]
   plt_details[[i]]<-list(year=df_obs$Year[i],test_metric=round(test_metric[i],3),spp_rich_metric=round(spp_rich_dist[i],3),spp_present=
                            spp_nms[which(df_obs[i,spp_nms]==1)],
                          surprising_absences=tmp[which(tmp<(-2.944439))], surprising_presences=tmp[which(tmp>(2.944439))])
 }
+
 # create results graphs for manuscript
 
 pa_a<-grep("PA-A",names(test_metric))
@@ -88,13 +95,14 @@ proj_ind[pa_a]<-1
 proj_ind[pa_b]<-2
 proj_ind[pa_c]<-3
 
-
+#test the correlation between richness and MVC
 cor.test(spp_rich_dist,test_metric)
 
+#store the restoration site mean and sd
 rest_site_mean<-c(mean(test_metric[pa_a]),mean(test_metric[pa_b]),mean(test_metric[pa_c]))
 rest_site_sd<-c(sd(test_metric[pa_a]),sd(test_metric[pa_b]),sd(test_metric[pa_c]))
 
-
+#create and save Figure 4 of main text
 clrs<-c("lightgrey", "#708090", "black")
 pdf("Output/figure_4.pdf",width = 10,height = 6)
 par(mfrow=c(1,2),mai=c(.8,.5,.2,.2),oma=c(1.5,1.5,1.5,1.5))
@@ -126,6 +134,7 @@ pa_c_pr<-table(unlist(sapply(plt_details[pa_c],function(x)names(x$surprising_pre
 #common surprisingly present taxa
 c(names(pa_a_pr),names(pa_b_pr))[duplicated(c(names(pa_a_pr),names(pa_b_pr)))]
 
+#create and save Figure 5 of main text
 pdf(file = "Output/figure_5.pdf",height = 8,width = 10)
 par(mar=c(5,8,2,2),mfrow=c(1,3),oma=c(2,4,1,1))
 barplot(pa_a_pr[order(pa_a_pr,decreasing = T)],horiz = T,
