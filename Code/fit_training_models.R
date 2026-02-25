@@ -50,6 +50,7 @@ occs<-apply(df_train[,spp_nms],2,sum)
 #find ubiquitous spp to hold for possible inclusion later
 ubiq<-names(occs[occs/dim(df_train)[1]>=.3])
 
+
 ####fit taxa models using lasso regularization and cross-validation to select "lambda" parameter###
 #this step can take an hour or more#
 
@@ -100,6 +101,10 @@ for(i in spp_nms){
 
 #select taxa with a "accuracy ratio" of between -0.5<x<=0.5
 sp_cand<-rownames(foo)[log((foo[,"sim"]+1)/(foo[,"act"]+1))<=0.5&log((foo[,"sim"]+1)/(foo[,"act"]+1))>=-0.5]
+
+#remove any that are rare
+rare_sp<-sp_cand[sp_cand%in%names(occs)[which(occs<=500)]]
+sp_cand<-sp_cand[!sp_cand%in%rare_sp]
 
 #check to see if ubiquitous taxa are included
 ubiq%in%sp_cand

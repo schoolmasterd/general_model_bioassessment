@@ -1,7 +1,7 @@
 #This script uses the combination of trained model and data from the Restoration
 # areas to calculate the MVC
 
-#load the library for latex-style sybmols in plots
+#load the library for latex-style symbols in plots
 library(latex2exp)
 
 #load the data from the training procedure
