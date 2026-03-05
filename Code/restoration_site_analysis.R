@@ -103,7 +103,7 @@ rest_site_mean<-c(mean(test_metric[pa_a]),mean(test_metric[pa_b]),mean(test_metr
 rest_site_sd<-c(sd(test_metric[pa_a]),sd(test_metric[pa_b]),sd(test_metric[pa_c]))
 
 #create and save Figure 4 of main text
-clrs<-c("lightgrey", "#708090", "black")
+clrs<-c("white", "#708090", "black")
 pdf("Output/figure_4.pdf",width = 10,height = 6)
 par(mfrow=c(1,2),mai=c(.8,.5,.2,.2),oma=c(1.5,1.5,1.5,1.5))
 plot(1:3,rest_site_mean,
