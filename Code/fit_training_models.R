@@ -86,7 +86,7 @@ spp_coefs<-sapply(spp_nms,function(x)as.vector(coef(fts[[x]],s=min(fts[[x]]$lamb
 rownames(spp_coefs)<-c("Intercept",env_vars,bas_vars)
 
 #predict occurrence across all holdout stations
-n=dim(df_latest[,env_vars])[1]
+n<-dim(df_latest[,env_vars])[1]
 foo<-matrix(NA,ncol = 4,nrow=length(spp_nms))
 row.names(foo)<-spp_nms
 colnames(foo)<-c("act","sim","lci","uci")
