@@ -17,7 +17,7 @@ df_test<-read.csv("Data/Other_rest_test_data.csv")
 #and that we have models for
 spp_nms<-names(spp_coef)
 
-#look species absent from restoration assemblage data and add them and set occupancy to zero
+#look for species absent from restoration assemblage data and add them and set occupancy to zero
 missing_spp<-spp_nms[!spp_nms%in%names(df_test)]
 miss_mat<-matrix(0,nrow=dim(df_test)[1],ncol=length(missing_spp))
 colnames(miss_mat)<-missing_spp

@@ -35,4 +35,4 @@ The code runs using R version 4.4.2.
 
 
 ## Code Run Time
-The code takes in the file fit_training_models can take one to three hours to run, depending on machine. The code that applies the models to the restoration areas (restoration_site_analysis.R) runs in less than one minute.
+The code takes in the file fit_training_models can take one to three hours to run, depending on the machine. The code that applies the models to the restoration areas (restoration_site_analysis.R) runs in less than one minute.

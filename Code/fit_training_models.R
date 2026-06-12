@@ -129,7 +129,7 @@ grp_sel<-hist(as.matrix(pct_tab)%*%as.matrix(1:4))
 #use chi-squared test with (number of categories -1 degree of freedom) to test if these differ
 1-pchisq(sum((grp_sel$density-grp_all$density)^2/grp_all$density),length(grp_all$density)-1)
 
-#create ans save the Figure S1
+#create and save the Figure S1
 pdf("Output/figure_S1.pdf",height = 5,width = 8)
 par(mfrow=c(1,2))
 plot(log(foo[sp_cand,"act"]),log(foo[sp_cand,"sim"]),pch=21,bg="grey",bty="l",xlim=c(1,6),ylim=c(1,6),
